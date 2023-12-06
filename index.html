@@ -1,1 +1,204 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .col-10 {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .fs-medium {
+            font-size: 1.5rem;
+        }
+
+        .fw-proxima-bold {
+            font-weight: bold;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        .measurement-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .height-input,
+        .weight-input {
+            margin-bottom: 15px;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-input {
+            margin-right: 10px;
+        }
+
+        .toggle-labels {
+            display: flex;
+        }
+
+        .imperial-label,
+        .metric-label,
+        .imperial-label-weight,
+        .metric-label-weight {
+            cursor: pointer;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .beato-green-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #result {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+     <form name="questionsixForm">
+        <div class="col-10 mx-auto" style="padding-bottom: 12px;">
+            <p class="fs-medium fw-proxima-bold mb-4 text-left">BMI Calculator</p>
+            <div class="measurement-container">
+                <div class="height-input">
+                    <label class="fs-small fw-proxima-bold" for="height">Height</label>
+                    <input type="number" id="height" name="height" id="feet" class="form-control" placeholder="Enter height">
+                    <span class="unit-indicator fw-proxima-bold">ft-in</span>
+                    <div class="toggle fs-small" style="margin-right:20px;">
+                        <input type="checkbox" id="heightToggleSwitch" class="toggle-input" checked>
+                        <div class="toggle-labels">
+                            <span class="imperial-label active fw-proxima-bold" data-unit="imperial">ft-in</span>
+                            <span class="metric-label fw-proxima-bold" data-unit="metric">cm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="measurement-container mt-3">
+                <div class="weight-input">
+                    <label class="fs-small fw-proxima-bold" for="weight">Weight</label>
+                    <input type="number" id="weight" name="weight" class="form-control" placeholder="Enter weight">
+                    <span class="unit-indicator-weight fw-proxima-bold">lbs</span>
+                    <div class="toggle fs-small" style="margin-right: 20px;">
+                        <input type="checkbox" id="weightToggleSwitch" class="toggle-input" checked>
+                        <div class="toggle-labels">
+                            <span class="imperial-label-weight active fw-proxima-bold" data-unit="imperial">lbs</span>
+                            <span class="metric-label-weight fw-proxima-bold" data-unit="metric">kg</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-left ml-4">
+                <button type="button" onclick="calculateBMI()" class="beato-green-btn fw-promixa-bold fs-small mt-5" style="width: 56%;font-weight:700;">Continue</button>
+            </div>
+
+            <!-- Display result here -->
+            <div id="result" class="mt-3"></div>
+        </div>
+    </form>
+
+
+<script>
+    function calculateBMI() {
+        // Get height and weight values
+        const height = document.getElementById('height').value;
+        const weight = document.getElementById('weight').value;
+
+        // Convert units if toggled
+        const heightUnit = document.getElementById('heightToggleSwitch').checked ? 'imperial' : 'metric';
+        const weightUnit = document.getElementById('weightToggleSwitch').checked ? 'imperial' : 'metric';
+
+        // Perform BMI calculation
+        const bmi = calculateBMIValue(height, weight, heightUnit, weightUnit);
+
+        // Display the result
+        const resultElement = document.getElementById('result');
+        resultElement.innerHTML = `BMI: ${bmi}`;
+    }
+
+    function calculateBMIValue(height, weight, heightUnit, weightUnit) {
+        // Convert units
+        const convertedHeight = heightUnit === 'imperial' ? height * 0.3048 : height / 100; // 1 ft = 0.3048 m, 1 cm = 0.01 m
+        const convertedWeight = weightUnit === 'imperial' ? weight * 0.453592 : weight; // 1 lb = 0.453592 kg
+
+        // Perform BMI calculation
+        const bmi = convertedWeight / (convertedHeight * convertedHeight);
+
+        // Return the calculated BMI value
+        return bmi.toFixed(2); // Round to 2 decimal places
+    }
+
+    // Toggle unit labels and indicators
+    document.getElementById('heightToggleSwitch').addEventListener('change', function () {
+        document.querySelector('.imperial-label').classList.toggle('active');
+        document.querySelector('.metric-label').classList.toggle('active');
+        document.querySelector('.unit-indicator').textContent = this.checked ? 'ft-in' : 'cm';
+
+        // Convert height input value when toggling
+        const heightInput = document.getElementById('height');
+        if (this.checked) {
+            // Convert to feet and inches
+            heightInput.value = (heightInput.value * 0.0328084).toFixed(2);
+        } else {
+            // Convert to centimeters
+            heightInput.value = (heightInput.value * 30.48).toFixed(2);
+        }
+    });
+
+    document.getElementById('weightToggleSwitch').addEventListener('change', function () {
+        document.querySelector('.imperial-label-weight').classList.toggle('active');
+        document.querySelector('.metric-label-weight').classList.toggle('active');
+        document.querySelector('.unit-indicator-weight').textContent = this.checked ? 'lbs' : 'kg';
+
+        // Convert weight input value when toggling
+        const weightInput = document.getElementById('weight');
+        if (this.checked) {
+            // Convert to pounds
+            weightInput.value = (weightInput.value * 2.20462).toFixed(2);
+        } else {
+            // Convert to kilograms
+            weightInput.value = (weightInput.value * 0.453592).toFixed(2);
+        }
+    });
+</script>
+
+</body>
+</html>
